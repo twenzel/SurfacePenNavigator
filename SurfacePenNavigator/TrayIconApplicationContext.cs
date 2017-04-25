@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace SurfacePenNavigator
 {
@@ -19,7 +20,26 @@ namespace SurfacePenNavigator
         public TrayIconApplicationContext()
         {
             _presentatorMode = new PresentatorMode();
-            CreateNotifyIcon();            
+            CreateNotifyIcon();
+            SubscribeSystemEvents();
+        }
+
+        private void SubscribeSystemEvents()
+        {
+            SystemEvents.PowerModeChanged += (s, e) => {
+                if (e.Mode == PowerModes.Suspend)
+                    DisablePresentationMode();
+            };
+
+            SystemEvents.SessionEnded += (s, e) => {
+                DisablePresentationMode();
+            };
+
+            SystemEvents.SessionSwitch += (s, e) => {
+                if (e.Reason == SessionSwitchReason.SessionLogoff)
+                    DisablePresentationMode();
+            };
+
         }
 
         private void CreateNotifyIcon()
@@ -65,8 +85,16 @@ namespace SurfacePenNavigator
             base.Dispose(disposing);
         }
 
+        private void DisablePresentationMode()
+        {
+            _presentatorMode.Disable();
+            UpdateModeTexts();
+        }
+
         private void Exit(object sender, EventArgs e)
         {
+            DisablePresentationMode();
+
             // We must manually tidy up and remove the icon before we exit.
             // Otherwise it will be left behind until the user mouses over.
             _notifyIcon.Visible = false;

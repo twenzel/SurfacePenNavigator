@@ -40,6 +40,15 @@ namespace SurfacePenNavigator
                 _hook.Enable();
         }
 
+        /// <summary>
+        /// Disables the presentation mode
+        /// </summary>
+        public void Disable()
+        {
+            if (_hook.Enabled)
+                _hook.Disable();
+        }
+
         private void InitHook()
         {
             _hook = new KeyboardHook();
@@ -61,6 +70,6 @@ namespace SurfacePenNavigator
                 SendKeys.Send("{UP}"); // Previous slide
             else if (e == Keys.F18)
                 SendKeys.Send("{HOME}"); // First slide
-        }        
+        }
     }
 }
