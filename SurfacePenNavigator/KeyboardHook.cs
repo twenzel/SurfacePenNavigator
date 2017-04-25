@@ -13,6 +13,7 @@ namespace SurfacePenNavigator
     {
         private int _hookHandle = 0;
         private List<Keys> _watchedKeys = new List<Keys>();
+        private NativeMethods.HookProc _hockDelegate;
 
         /// <summary>
         /// Occurs when the watched key was triggered (pressed)
@@ -35,9 +36,9 @@ namespace SurfacePenNavigator
         /// <returns></returns>
         public bool Enable()
         {
-            var hookProcedure = new NativeMethods.HookProc(KeyHookProc);
+            _hockDelegate = new NativeMethods.HookProc(KeyHookProc);
 
-            _hookHandle = NativeMethods.SetWindowsHookEx(NativeMethods.WH_KEYBOARD_LL, hookProcedure, IntPtr.Zero, 0);
+            _hookHandle = NativeMethods.SetWindowsHookEx(NativeMethods.WH_KEYBOARD_LL, _hockDelegate, IntPtr.Zero, 0);
 
             return _hookHandle != 0;
         }
@@ -51,6 +52,7 @@ namespace SurfacePenNavigator
                 NativeMethods.UnhookWindowsHookEx(_hookHandle);
 
             _hookHandle = 0;
+            _hockDelegate = null;
         }
 
         /// <summary>
